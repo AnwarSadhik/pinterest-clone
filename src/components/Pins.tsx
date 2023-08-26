@@ -26,7 +26,7 @@ const Pins = () => {
   }, []);
 
   return (
-    <motion.div className="md:gap-4 p-4 space-y-4 columns-2 md:columns-4">
+    <motion.div className="md:gap-8 p-4 space-y-4 columns-2 md:columns-4">
       {pins.map((pin) => (
         <div key={pin.id} className="rounded-xl overflow-hidden w-full aspect-auto">
             <Image
