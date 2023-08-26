@@ -6,7 +6,11 @@ import { GrFormUpload } from "react-icons/gr";
 import { Avatar } from "./ui/avatar";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
-import { storage } from "@/lib/firebase";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { useToast } from "./ui/use-toast";
+import app from "@/lib/firebase";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
+import cuid from "cuid";
 
 type User = {
   name?: string | null | undefined;
@@ -22,7 +26,7 @@ interface Pin {
   title: string;
   description: string;
   tag: string;
-  imageFile?: File;
+  // imageFile?: File;
   imageUrl?: string;
   userName?: string | null;
   userProfile?: string | null;
@@ -30,27 +34,29 @@ interface Pin {
 
 const PinForm: React.FC<Props> = ({ user }) => {
   const imgRef = React.useRef<HTMLInputElement>(null);
+  const storage = getStorage(app);
+  const { toast } = useToast();
+  const db = getFirestore(app);
 
   const [pinData, setPinData] = React.useState<Pin>({
     title: "",
     description: "",
     tag: "",
-    imageFile: undefined,
     imageUrl: "",
     userName: user?.name || null,
     userProfile: user?.image || null,
   });
+  const [selectedImg, setSelectedImg] = React.useState<File>();
+  const [busy, setBusy] = React.useState<Boolean | undefined>(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedImg = e.target.files?.[0];
     if (selectedImg) {
-      setPinData((prevPinData) => ({
-        ...prevPinData,
-        imageFile: selectedImg,
-        imageUrl: URL.createObjectURL(selectedImg),
-      }));
+      setSelectedImg(selectedImg);
     }
   };
+
+  // console.log(selectedImg);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -62,15 +68,82 @@ const PinForm: React.FC<Props> = ({ user }) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    // First, upload the image if it exists
-    if (pinData.imageFile) {
+  const handleSave = async () => {
+    const storageRef = ref(storage, "pinterest/" + selectedImg?.name);
+
+    try {
+      await uploadBytes(storageRef, selectedImg as File);
+      // console.log("File uploaded successfully!");
+
+      const url = await getDownloadURL(storageRef);
+      // console.log(url);
+      // return url;
+      const pinId = cuid();
+
+      const pinDataToSave = {
+        title: pinData.title,
+        description: pinData.description,
+        tag: pinData.tag,
+        imageUrl: url,
+        userName: pinData.userName,
+        userProfile: pinData.userProfile,
+        createdAt: new Date(),
+      };
+
+      // console.log(pinDataToSave);
+
+      const pinRef = doc(db, "pins", pinId);
+      await setDoc(pinRef, pinDataToSave).then(() => {
+        // console.log("OK");
+        window.location.href = "/";
+      });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      throw error;
     }
   };
 
-  console.log(pinData);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (selectedImg && selectedImg.size > 3 * 1024 * 1024) {
+      toast({
+        title: "Image size exceeds 3MB limit!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedImg) {
+      try {
+        setBusy(true);
+        await handleSave().then(() => {
+          setBusy(false);
+        });
+
+        toast({
+          title: "Pin created successfully!",
+          variant: "success",
+        });
+        setBusy(false);
+      } catch (error) {
+        setBusy(false);
+        toast({
+          title: "Error creating pin.",
+          description: "There was an issue uploading the image.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setBusy(false);
+      toast({
+        title: "Select an image file!",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // console.log(pinData);
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col md:flex-row space-y-10">
@@ -79,11 +152,11 @@ const PinForm: React.FC<Props> = ({ user }) => {
             className="flex justify-center items-center h-full cursor-pointer bg-gray-100 rounded-lg"
             onClick={() => imgRef.current?.click()}
           >
-            {pinData.imageFile ? (
+            {selectedImg ? (
               <img
-                src={URL.createObjectURL(pinData.imageFile)}
+                src={URL.createObjectURL(selectedImg)}
                 alt="Uploaded"
-                className="h-full w-full object-cover"
+                className="h-full max-h-full w-full object-cover"
               />
             ) : (
               <>
@@ -102,9 +175,18 @@ const PinForm: React.FC<Props> = ({ user }) => {
               onChange={handleImageChange}
             />
           </div>
-          <Button className="bg-red-500 absolute top-28 right-4 md:right-10 md:top-10 px-11 py-3 font-extrabold rounded-full">
-            Save
-          </Button>
+          {busy ? (
+            <Button
+              className="bg-red-500 absolute top-28 right-4 md:right-10 md:top-10 px-11 py-3 font-extrabold rounded-full"
+              disabled={busy as boolean}
+            >
+              Saving...
+            </Button>
+          ) : (
+            <Button className="bg-red-500 absolute top-28 right-4 md:right-10 md:top-10 px-11 py-3 font-extrabold rounded-full">
+              Save
+            </Button>
+          )}
         </div>
         <div className="flex flex-col justify-center items-center w-full px-10 space-y-10">
           <div className="w-full">
@@ -112,6 +194,7 @@ const PinForm: React.FC<Props> = ({ user }) => {
               placeholder="Add your title"
               name="title"
               onChange={handleChange}
+              // required
             />
             <label htmlFor="name" className="px-[0.5rem] text-xs text-gray-600">
               The first 40 characters that show up in your feed

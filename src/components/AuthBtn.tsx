@@ -8,7 +8,7 @@ type Props = {}
 
 const AuthBtn = (props: Props) => {
   return (
-    <Button className='px-8 py-[2px] font-bold rounded-full bg-black dark:bg-white'
+    <Button className='px-8 py-[1px] font-bold rounded-full bg-[#1d1d1d] text-white'
     onClick={() => signIn()}
     >
         SignIn

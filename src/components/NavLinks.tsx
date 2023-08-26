@@ -5,13 +5,13 @@ import { MdExplore } from "react-icons/md";
 import { IoIosCreate } from "react-icons/io";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "./ui/use-toast";
 
 type User = {
   name?: string | null | undefined;
   email?: string | null | undefined;
   image?: string | null | undefined;
 };
-
 
 type Props = {
   // user: {
@@ -49,6 +49,7 @@ const navLinks: NavLink[] = [
 const NavLinks = ({ user }: Props) => {
   const router = useRouter();
   const [activeLink, setActiveLink] = React.useState<string | null>("/");
+  const { toast } = useToast();
 
   const handleLinkClick = (path: string) => {
     setActiveLink(path);
@@ -56,9 +57,14 @@ const NavLinks = ({ user }: Props) => {
 
   React.useEffect(() => {
     if (!user && activeLink === "/create") {
-      window.alert("Login first to create a pin")
+      // window.alert("Login first to create a pin")
       router.push("/");
       setActiveLink("/");
+      toast({
+        title: "Login First!",
+        description: "You must be logged in to create a Pin",
+        variant: "destructive",
+      });
     }
   }, [activeLink, user, router]);
 

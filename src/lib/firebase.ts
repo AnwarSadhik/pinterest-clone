@@ -12,10 +12,5 @@ const config = {
 };
 
 const app = initializeApp(config);
-const storage = getStorage(app);
 
-const getFirestoreInstance = () => {
-  return getFirestore(app);
-};
-
-export { storage, getFirestoreInstance as getFirestore };
+export default app;

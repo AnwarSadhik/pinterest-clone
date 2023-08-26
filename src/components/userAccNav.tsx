@@ -10,10 +10,10 @@ import React from "react";
 import { signOut } from "next-auth/react";
 import { LuLogOut } from "react-icons/lu";
 import UserAvatar from "./UserProfile";
-import { getFirestore } from '@/lib/firebase';
-import { doc, setDoc } from "firebase/firestore";
-import { redirect, useRouter } from "next/navigation";
- 
+import app from "@/lib/firebase";
+import { doc, setDoc, getFirestore } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+
 type Props = {
   user: {
     name?: string | null | undefined;
@@ -23,9 +23,9 @@ type Props = {
 };
 
 const UserAccountNav = ({ user }: Props) => {
-  const db = getFirestore();
+  const db = getFirestore(app);
   const router = useRouter();
-    
+
   const saveUser = async (user: any) => {
     if (user) {
       try {

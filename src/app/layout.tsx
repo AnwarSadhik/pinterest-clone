@@ -3,7 +3,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
-import Providers from "@/components/Providers"
+import Providers from "@/components/Providers";
+import { Toaster } from "@/components/ui/toaster";
 
 const my_font = DM_Sans({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           {children}
+          <Toaster />
         </Providers>
       </body>
     </html>
