@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 const Pins = () => {
   const db = getFirestore(app);
   const [pins, setPins] = useState<any[]>([]);
+  const [loading,setLoading] = useState<Boolean>(false)
 
   const fetchPins = async () => {
     const pinsCollection = collection(db, "pins");
@@ -18,7 +19,9 @@ const Pins = () => {
       pinsData.push({ id: doc.id, ...doc.data() });
     });
 
+    setLoading(true);
     setPins(pinsData);
+    setLoading(false);
   };
 
   useEffect(() => {
