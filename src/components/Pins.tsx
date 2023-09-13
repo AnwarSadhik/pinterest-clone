@@ -3,7 +3,6 @@ import app from "@/lib/firebase";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 
 const Pins = () => {
   const db = getFirestore(app);
@@ -29,7 +28,7 @@ const Pins = () => {
   }, []);
 
   return (
-    <motion.div className="md:gap-8 p-4 space-y-4 columns-2 md:columns-4">
+    <div className="md:gap-8 p-4 space-y-4 columns-2 md:columns-4">
       {pins.map((pin) => (
         <div key={pin.id} className="rounded-xl overflow-hidden w-full aspect-auto">
             <Image
@@ -41,7 +40,7 @@ const Pins = () => {
             />
         </div>
       ))}
-    </motion.div>
+    </div>
   );
 };
 

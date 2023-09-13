@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Providers from "@/components/Providers";
 import { Toaster } from "@/components/ui/toaster";
 
-const my_font = DM_Sans({ subsets: ["latin"] });
+const font = DM_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Pinterest",
@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={cn(my_font.className, `antialiased min-h-screen`)}>
+      <body className={cn(font.className, `antialiased min-h-screen`)}>
         <Providers>
           <Navbar />
           {children}
