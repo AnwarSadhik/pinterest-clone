@@ -5,32 +5,26 @@ import AuthBtn from "./AuthBtn";
 import { getAuthSession } from "@/app/api/auth/[...nextauth]/route";
 import UserAccNav from "./userAccNav";
 import NavLinks from "./NavLinks";
+import SearchPins from "./SearchPins";
 
 type Props = {};
 
 const Navbar = async (props: Props) => {
   const session = await getAuthSession();
-
   return (
     <main className="py-5 px-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center md:gap-x-8 px-2">
           <Link href="/">
-            <BsPinterest size={36} className="text-red-600" />
+            <BsPinterest
+              size={36}
+              className="text-red-600 absolute left-2 top-6 md:block"
+            />
           </Link>
           <NavLinks user={session?.user} />
         </div>
         <div className="flex w-full items-center justify-around">
-          <div className="flex items-center w-full">
-            <BsSearch
-              className="md:relative md:left-[2.6rem] text-black"
-              size={15}
-            />
-            <Input
-              placeholder="Search"
-              className="hidden text-black md:block font-semibold md:w-full rounded-full ml-4 pl-8 py-5  bg-[#e9e9e9] outline-none"
-            />
-          </div>
+          <SearchPins />
           <div className="px-4 md:flex items-center md:gap-x-2">
             <div>
               {session?.user ? <UserAccNav user={session.user} /> : <AuthBtn />}

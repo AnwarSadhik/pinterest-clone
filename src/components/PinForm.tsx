@@ -106,9 +106,9 @@ const PinForm: React.FC<Props> = ({ user }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (selectedImg && selectedImg.size > 3 * 1024 * 1024) {
+    if (selectedImg && selectedImg.size > 1 * 1024 * 1024) {
       toast({
-        title: "Image size exceeds 3MB limit!",
+        title: "Image size exceeds 1MB limit!",
         variant: "destructive",
       });
       return;
@@ -197,7 +197,7 @@ const PinForm: React.FC<Props> = ({ user }) => {
               // required
             />
             <label htmlFor="name" className="px-[0.5rem] text-xs text-gray-600">
-              The first 40 characters that show up in your feed
+              The first 20 characters that show up in your feed
             </label>
             <div className="flex items-center mt-2 gap-x-2">
               <Avatar>

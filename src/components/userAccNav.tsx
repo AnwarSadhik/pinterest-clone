@@ -52,7 +52,7 @@ const UserAccountNav = ({ user }: Props) => {
   // console.log(userName);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu >
       <DropdownMenuTrigger>
         {/* <img src={user.image as string} alt="pfp" className="w-10 h-10 rounded-full"/> */}
         <UserAvatar user={user} />

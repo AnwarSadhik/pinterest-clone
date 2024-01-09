@@ -3,6 +3,8 @@ import app from "@/lib/firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import React from "react";
 import Image from "next/image";
+import UserPins from "@/components/UserPins";
+import SavedPins from "@/components/SavedPins";
 
 type Props = {
   params: {
@@ -19,7 +21,11 @@ interface User {
 const page = ({ params: { userId } }: Props) => {
   const db = getFirestore(app);
   const [user, setUser] = React.useState<User>();
-  console.log(userId);
+  // const [active, setActive] = React.useState<string>("created");
+  const [activeTab, setActiveTab] = React.useState<"created" | "saved">(
+    "created"
+  );
+  // console.log(userId);
 
   React.useEffect(() => {
     if (userId) {
@@ -38,6 +44,9 @@ const page = ({ params: { userId } }: Props) => {
   };
 
   // console.log(user);
+  const toggleTab = (tab: "created" | "saved") => {
+    setActiveTab(tab);
+  };
 
   return (
     <main className="py-4 flex justify-center items-center">
@@ -56,9 +65,28 @@ const page = ({ params: { userId } }: Props) => {
           </div>
         </div>
         <div className="py-10 flex flex-row gap-x-32 font-medium">
-          <div className="cursor-pointer">Created</div>
-          <div className="cursor-pointer">Saved</div>
+          <div
+            className={`cursor-pointer ${
+              activeTab === "created" ? "border-b-2 border-black" : ""
+            }`}
+            onClick={() => setActiveTab("created")}
+          >
+            Created
+          </div>
+          <div
+            className={`cursor-pointer ${
+              activeTab === "saved" ? "border-b-2 border-black" : ""
+            }`}
+            onClick={() => setActiveTab("saved")}
+          >
+            Saved
+          </div>
         </div>
+        {activeTab === "created" ? (
+          <UserPins user={userId} />
+        ) : (
+          <SavedPins user={userId} />
+        )}
       </div>
     </main>
   );

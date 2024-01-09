@@ -35,11 +35,6 @@ const navLinks: NavLink[] = [
     path: "/",
   },
   {
-    title: "Explore",
-    icon: <MdExplore size={21} />,
-    path: "/explore",
-  },
-  {
     title: "Create",
     icon: <IoIosCreate size={21} />,
     path: "/create",
@@ -69,7 +64,7 @@ const NavLinks = ({ user }: Props) => {
   }, [activeLink, user, router]);
 
   return (
-    <div className="hidden md:flex items-center space-x-4">
+    <div className="hidden md:flex items-center space-x-6">
       {navLinks.map((link) => (
         <Link
           key={link.title}
